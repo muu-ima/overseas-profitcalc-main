@@ -18,7 +18,12 @@ export function findPriceByWeight(
   for (const option of options) {
     if (weight <= option.weight) return option.price;
   }
-  // 重量が最大を超えたら null を返す
+  // 重量が最大を超えたら最後の（最大の）価格 or ひとつ手前を返す
+  if (options.length > 1) {
+    return options[options.length - 1].price;
+    // もし「ひとつ手前」なら:
+    // return options[options.length - 2].price;
+  }
   return null;
 }
 
