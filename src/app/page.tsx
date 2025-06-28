@@ -155,7 +155,7 @@ export default function Page() {
       shippingJPY: calcResult.shippingJPY,
       categoryFeeJPY: calcResult.categoryFeeJPY,
       customsRate: 4, // 関税率
-      platformRate: 15, // 任意
+      platformRate: 0, // 任意
       includeVAT: includeVAT, // 自動判定
       exchangeRateGBPtoJPY: rate ?? undefined,
     })
