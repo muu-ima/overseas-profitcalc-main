@@ -13,6 +13,7 @@ import {
   calculateFinalProfitDetail, // ✅
 } from "@/lib/profitCalc";
 
+import { isUnder135GBP } from "@/lib/vatRule";
 // import { calculateFinalProfitDetail } from "@/lib/profitCalc";
 import FinalResult from "./components/FinalResult";
 
@@ -40,6 +41,7 @@ type CalcResult = {
 
 
 export default function Page() {
+  // State管理
   const [shippingRates, setShippingRates] = useState<ShippingData | null>(null);
   const [costPrice, setCostPrice] = useState<number | "">("");
   const [sellingPrice, setSellingPrice] = useState<number | "">("");
@@ -56,12 +58,27 @@ export default function Page() {
   );
   const [result, setResult] = useState<ShippingResult | null>(null);
   const [calcResult, setCalcResult] = useState<CalcResult | null>(null);
+  // VATのStateを追加
+  const [includeVAT, setIncludeVAT] = useState<boolean>(false);
 
+  // 配送料データ読み込み
   useEffect(() => {
     fetch("/data/shipping.json")
       .then((res) => res.json())
       .then((data) => setShippingRates(data));
   }, []);
+
+  // VAT判定専用
+  useEffect(() => {
+    if (sellingPrice !== "" && rate !== null) {
+      const priceGBP =
+        typeof sellingPrice === "number" ? sellingPrice / rate : 0;
+      setIncludeVAT(isUnder135GBP(priceGBP));
+    } else {
+      setIncludeVAT(false);
+    }
+  }, [sellingPrice, rate]);
+
 
   // 計算結果用のuseEffect
   useEffect(() => {
@@ -108,6 +125,7 @@ export default function Page() {
         profitMargin,
         method: result.method,
       });
+
     }
   }, [sellingPrice, costPrice, rate, weight, result, selectedCategoryFee]);
 
@@ -131,17 +149,17 @@ export default function Page() {
   }, [shippingRates, weight, dimensions]);
 
   const final = calcResult
-  ? calculateFinalProfitDetail({
+    ? calculateFinalProfitDetail({
       sellingPrice: typeof sellingPrice === "number" ? sellingPrice : 0,
       costPrice: typeof costPrice === "number" ? costPrice : 0,
       shippingJPY: calcResult.shippingJPY,
       categoryFeeJPY: calcResult.categoryFeeJPY,
       customsRate: 4, // 関税率
       platformRate: 15, // 任意
-      includeVAT: true,   
-      exchangeRateGBPtoJPY: rate ?? undefined, 
+      includeVAT: includeVAT, // 自動判定
+      exchangeRateGBPtoJPY: rate ?? undefined,
     })
-  : null;
+    : null;
 
 
 
@@ -218,19 +236,38 @@ export default function Page() {
           </option>
         ))}
       </select>
-      {result && (
-        <div>
-          <p>配送方法: {result.method}</p>
-          <p>配送料: {result.price !== null ? `${result.price} 円` : "計算中..."}</p>
-        </div>
-      )}
+
+      {/* ここにVAT表示を入れる */}
+      <p className="text-sm text-gray-600">
+        VAT: {includeVAT ? "適用（135GBP以下）" : "非適用（135GBP超え）"}
+      </p>
+      {/* 配送結果 */}
+      <div>
+        <p>
+          配送方法: {
+            result === null
+              ? "計算中..."
+              : result.method
+          }
+        </p>
+        <p>
+          配送料: {
+            result === null
+              ? "計算中..."
+              : result.price !== null
+                ? `${result.price}円`
+                : "不明"
+          }
+        </p>
+      </div>
 
 
+      {/* 利益結果 */}
       {rate !== null && sellingPrice !== "" && (
         <Result
           priceGBP={typeof sellingPrice === "number" ? sellingPrice / rate : 0}
           rate={rate}
-          includeVAT={true} //または切り替え機能を後から追加
+          includeVAT={includeVAT} // 自動判定
           calcResult={calcResult}
         />
       )}
