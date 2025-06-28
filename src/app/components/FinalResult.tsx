@@ -1,11 +1,15 @@
 "use client";
 
+import { isUnder135GBP, applyVAT } from "@/lib/vatRule";
+
 type FinalProfitDetail = {
   customsFee: number;
   platformFee: number;
   totalCost: number;
   profit: number;
   profitMargin: number;
+   vatAmount?: number;         // 追加（任意）
+  priceIncludingVAT?: number; // 追加（任意）
 };
 
 type FinalResultProps = {
@@ -27,6 +31,12 @@ export default function FinalResult({
       <p>配送方法: {shippingMethod}</p>
       <p>配送料: {shippingJPY.toLocaleString()} 円</p>
       <p>カテゴリ手数料: {categoryFeeJPY.toLocaleString()} 円</p>
+        {data.vatAmount !== undefined && (
+        <p>VAT額: {data.vatAmount.toLocaleString()} 円</p>
+      )}
+      {data.priceIncludingVAT !== undefined && (
+        <p>VAT込み価格: {data.priceIncludingVAT.toLocaleString()} 円</p>
+      )}
       <p>関税: {data.customsFee.toLocaleString()} 円</p>
       <p>プラットフォーム手数料: {data.platformFee.toLocaleString()} 円</p>
       <p>実費合計: {data.totalCost.toLocaleString()} 円</p>
