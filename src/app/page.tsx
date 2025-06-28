@@ -10,8 +10,9 @@ import {
   calculateActualCost,
   calculateGrossProfit,
   calculateProfitMargin,
-   calculateFinalProfitDetail, // これを追加
+  calculateFinalProfitDetail, // ✅
 } from "@/lib/profitCalc";
+
 // import { calculateFinalProfitDetail } from "@/lib/profitCalc";
 import FinalResult from "./components/FinalResult";
 
@@ -135,10 +136,10 @@ export default function Page() {
       costPrice: typeof costPrice === "number" ? costPrice : 0,
       shippingJPY: calcResult.shippingJPY,
       categoryFeeJPY: calcResult.categoryFeeJPY,
-      customsRate: 10, // 任意
+      customsRate: 4, // 関税率
       platformRate: 15, // 任意
-      includeVAT: true,   // ここ追加
-      exchangeRateGBPtoJPY: rate ?? undefined, // ここ追加
+      includeVAT: true,   
+      exchangeRateGBPtoJPY: rate ?? undefined, 
     })
   : null;
 

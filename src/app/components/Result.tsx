@@ -12,8 +12,8 @@ type ResultProps = {
 };
 
 export default function Result({ priceGBP, rate, includeVAT }: ResultProps) {
-    //VAT加算前の価格が135ポンド以下かどうか
-    const underThreshold = isUnder135GBP(priceGBP);
+      //135ポンド以上かどうか (ロジック反転)
+    const overThreshold = !isUnder135GBP(priceGBP);
 
     //VAT適用したGBP価格
     const priceWithVAT = includeVAT ? applyVAT(priceGBP) : priceGBP;
@@ -25,7 +25,7 @@ export default function Result({ priceGBP, rate, includeVAT }: ResultProps) {
         <div className="result-box p-4 border rounded bg-gray-50">
             <p>GBP価格: ￡{priceGBP.toFixed(2)}</p>
             <p>為替レート: {rate} 円</p>
-            <p>135ポンド以下： {underThreshold ? "はい" : "いいえ"}</p>
+            <p>135ポンド以上： {overThreshold ? "はい" : "いいえ"}</p>
             <p>VAT {includeVAT ? "含む" : "含まない"}</p>
             <p className="font-bold text-lg mt-2">最終価格: ￥{finalJPY.toLocaleString()}</p>
         </div>
