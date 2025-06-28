@@ -10,7 +10,7 @@ import {
   calculateActualCost,
   calculateGrossProfit,
   calculateProfitMargin,
-  calculateFinalProfitDetail, // ✅
+  calculateFinalProfitDetail, 
 } from "@/lib/profitCalc";
 
 import { isUnder135GBP } from "@/lib/vatRule";
