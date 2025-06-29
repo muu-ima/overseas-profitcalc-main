@@ -1,6 +1,6 @@
 "use client";
 
-import { isUnder135GBP, applyVAT } from "@/lib/vatRule";
+// import { isUnder135GBP, applyVAT } from "@/lib/vatRule";
 
 type FinalProfitDetail = {
   customsFee: number;

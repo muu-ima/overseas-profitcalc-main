@@ -5,11 +5,20 @@ import { applyVAT, isUnder135GBP } from "@/lib/vatRule";
 import { getAdjustedRate } from "@/lib/exchange";
 import { convertToJPY } from "@/lib/price";
 
+type CalcResult = {
+    shippingJPY: number;
+    categoryFeeJPY: number;
+    actualCost: number;
+    grossProfit: number;
+    profitMargin: number;
+    method: string;
+};
+
 type ResultProps = {
     priceGBP: number;
     rate: number;         // APIから取得した生レート
     includeVAT: boolean;
-    calcResult: any;
+    calcResult: CalcResult | null;  // anyを具体的に
 };
 
 export default function Result({ priceGBP, rate, includeVAT }: ResultProps) {
@@ -25,7 +34,7 @@ export default function Result({ priceGBP, rate, includeVAT }: ResultProps) {
     const priceWithVAT = includeVAT ? applyVAT(priceGBP) : priceGBP;
 
     //最終JPY価格（四捨五入）
-    const finalJPY = convertToJPY(priceWithVAT, adjustedRate); 
+    const finalJPY = convertToJPY(priceWithVAT, adjustedRate);
 
     return (
         <div className="result-box p-4 border rounded bg-gray-50">

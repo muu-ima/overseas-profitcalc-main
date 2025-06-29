@@ -137,7 +137,7 @@ export default function Page() {
 
   useEffect(() => {
     if (rate !== null) {
-      console.log(`最新為替レート：, rate`);
+     console.log(`最新為替レート：${rate}`);
     }
   }, [rate]);
 
@@ -254,15 +254,11 @@ export default function Page() {
             className="w-full px-3 py-2 border rounded-md"
           >
             <option value="">カテゴリを選択してください</option>
-            <select>
-              <option value="">カテゴリを選択してください</option>
-              {categoryOptions.map((cat) => (
-                <option key={cat.label} value={cat.value}>
-                  {cat.label} ({cat.value}%)
-                </option>
-              ))}
-            </select>
-
+            {categoryOptions.map((cat) => (
+              <option key={cat.label} value={cat.value}>
+                {cat.label} ({cat.value}%)
+              </option>
+            ))}
           </select>
         </div>
         {/* <select
