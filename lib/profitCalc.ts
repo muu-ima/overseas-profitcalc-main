@@ -29,6 +29,7 @@ export function calculateFinalProfitDetail({
     platformRate,
     includeVAT = false,
     exchangeRateGBPtoJPY,
+    targetMargin = 0.25, // 👈 例えば 25% をデフォルトにする
 }: {
     sellingPrice: number;
     costPrice: number;
@@ -38,6 +39,7 @@ export function calculateFinalProfitDetail({
     platformRate: number;
     includeVAT?: boolean;
     exchangeRateGBPtoJPY?: number;
+    targetMargin?: number;
 }) {
     let adjustedSellingPrice = sellingPrice;
 
@@ -64,6 +66,8 @@ export function calculateFinalProfitDetail({
 
     const vatAmount = adjustedSellingPrice - sellingPrice;
 
+    const suggestedPrice = totalCost / (1 - targetMargin);
+
     return {
         customsFee,
         platformFee,
@@ -72,6 +76,8 @@ export function calculateFinalProfitDetail({
         profitMargin,
         vatAmount,
         priceIncludingVAT: adjustedSellingPrice,
+        suggestedPrice,
+        targetMargin,
     };
 }
 
@@ -142,3 +148,5 @@ export function calculateProfitMargin(
     if (sellingPrice === 0) return 0;
     return (grossProfit / sellingPrice) * 100;
 }
+
+

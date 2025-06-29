@@ -10,7 +10,7 @@ import {
   calculateActualCost,
   calculateGrossProfit,
   calculateProfitMargin,
-  calculateFinalProfitDetail, 
+  calculateFinalProfitDetail,
 } from "@/lib/profitCalc";
 
 import { isUnder135GBP } from "@/lib/vatRule";
@@ -164,123 +164,162 @@ export default function Page() {
 
 
   return (
-    <div className="p-4 max-w-sm mx-auto flex flex-col space-y-4">
-      {/* 為替レート表示コンポーネント */}
-      <ExchangeRate onRateChange={setRate} />
-      <input
-        type="number"
-        value={costPrice}
-        onChange={(e) => {
-          const val = e.target.value;
-          setCostPrice(val === "" ? "" : Number(val));
-        }}
-        placeholder="仕入れ値(円)"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-      <input
-        type="number"
-        value={sellingPrice}
-        onChange={(e) => {
-          const val = e.target.value;
-          setSellingPrice(val === "" ? "" : Number(val));
-        }}
-        placeholder="売値(円)"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-      <input
-        type="number"
-        value={weight ?? ""}
-        onChange={(e) => {
-          const val = e.target.value;
-          setWeight(val === "" ? null : Number(val));
-        }}
-        placeholder="実容量(g)"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-      <input
-        type="number"
-        value={dimensions.length === 0 ? "" : dimensions.length}
-        onChange={(e) =>
-          setDimensions((prev) => ({ ...prev, length: Number(e.target.value) }))
-        }
-        placeholder="長さ(cm)"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-      <input
-        type="number"
-        value={dimensions.width === 0 ? "" : dimensions.width}
-        onChange={(e) =>
-          setDimensions((prev) => ({ ...prev, width: Number(e.target.value) }))
-        }
-        placeholder="幅(cm)"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-      <input
-        type="number"
-        value={dimensions.height === 0 ? "" : dimensions.height}
-        onChange={(e) =>
-          setDimensions((prev) => ({ ...prev, height: Number(e.target.value) }))
-        }
-        placeholder="高さ(cm)"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-      <select
-        value={selectedCategoryFee}
-        onChange={(e) => setSelectedCategoryFee(Number(e.target.value))}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      >
-        <option value="">カテゴリを選択してください</option>
-        {categoryOptions.map((cat) => (
-          <option key={cat.label} value={cat.value}>
-            {cat.label} ({cat.value}%)
-          </option>
-        ))}
-      </select>
+    <div className="p-4 max-w-5xl mx-auto flex flex-col md:flex-row md:space-x-8 space-y-8 md:space-y-0">
+      <div className="flex-1 flex flex-col space-y-4">
+        {/* 為替レート表示コンポーネント */}
+        <ExchangeRate onRateChange={setRate} />
+        <div>
+          <label className="block font-semibold mb-1">仕入れ値 (円) </label>
+          <input
+            type="number"
+            value={costPrice}
+            onChange={(e) =>
+              setCostPrice(e.target.value === "" ? "" : Number(e.target.value))
+            }
+            placeholder="仕入れ値"
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">売値 (円) </label>
+          <input
+            type="number"
+            value={sellingPrice}
+            onChange={(e) =>
+              setSellingPrice(e.target.value === "" ? "" : Number(e.target.value))
+            }
+            placeholder="売値"
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        </div>
 
-      {/* ここにVAT表示を入れる */}
-      <p className="text-sm text-gray-600">
-        VAT: {includeVAT ? "適用（135GBP以下）" : "非適用（135GBP超え）"}
-      </p>
-      {/* 配送結果 */}
-      <div>
-        <p>
-          配送方法: {
-            result === null
-              ? "計算中..."
-              : result.method
-          }
-        </p>
-        <p>
-          配送料: {
-            result === null
-              ? "計算中..."
-              : result.price !== null
-                ? `${result.price}円`
-                : "不明"
-          }
-        </p>
+        <div>
+          <label className="block font-semibold mb-1">実重量 (g) </label>
+          <input
+            type="number"
+            value={weight ?? ""}
+            onChange={(e) =>
+              setWeight(e.target.value === "" ? null : Number(e.target.value))
+            }
+            placeholder="実重量"
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">サイズ (cm)</label>
+          <div className="grid grid-cols-3 gap-2">
+            <input
+              type="number"
+              value={dimensions.length || ""}
+              onChange={(e) =>
+                setDimensions((prev) => ({
+                  ...prev,
+                  length: Number(e.target.value),
+                }))
+              }
+              placeholder="長さ"
+              className="px-2 py-1 border rounded-md"
+            />
+            <input
+              type="number"
+              value={dimensions.width || ""}
+              onChange={(e) =>
+                setDimensions((prev) => ({
+                  ...prev,
+                  width: Number(e.target.value),
+                }))
+              }
+              placeholder="幅"
+              className="px-2 py-1 border rounded-md"
+            />
+            <input
+              type="number"
+              value={dimensions.height || ""}
+              onChange={(e) =>
+                setDimensions((prev) => ({
+                  ...prev,
+                  height: Number(e.target.value),
+                }))
+              }
+              placeholder="高さ"
+              className="px-2 py-1 border rounded-md"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">カテゴリ手数料 </label>
+          <select
+            value={selectedCategoryFee}
+            onChange={(e) => setSelectedCategoryFee(Number(e.target.value))}
+            className="w-full px-3 py-2 border rounded-md"
+          >
+            <option value="">カテゴリを選択してください</option>
+            {categoryOptions.map((cat: any) => (
+              <option key={cat.label} value={cat.value}>
+                {cat.label} ({cat.value}%)
+              </option>
+            ))}
+          </select>
+        </div>
+        {/* <select
+          value={selectedCategoryFee}
+          onChange={(e) => setSelectedCategoryFee(Number(e.target.value))}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="">カテゴリを選択してください</option>
+          {categoryOptions.map((cat) => (
+            <option key={cat.label} value={cat.value}>
+              {cat.label} ({cat.value}%)
+            </option>
+          ))}
+        </select> */}
       </div>
+      {/* 右カラム */}
+      <div className="flex-1 flex flex-col space-y-4">
+        {/* 配送結果と利益結果を右側に移動する */}
+        <p className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          VAT: {includeVAT ? "適用（135GBP以下）" : "非適用（135GBP超え）"}
+        </p>
+        {/* 配送結果 */}
+        <div className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <p>
+            配送方法: {
+              result === null
+                ? "計算中..."
+                : result.method
+            }
+          </p>
+          <p>
+            配送料: {
+              result === null
+                ? "計算中..."
+                : result.price !== null
+                  ? `${result.price}円`
+                  : "不明"
+            }
+          </p>
+        </div>
 
 
-      {/* 利益結果 */}
-      {rate !== null && sellingPrice !== "" && (
-        <Result
-          priceGBP={typeof sellingPrice === "number" ? sellingPrice / rate : 0}
-          rate={rate}
-          includeVAT={includeVAT} // 自動判定
-          calcResult={calcResult}
-        />
-      )}
+        {/* 利益結果 */}
+        {rate !== null && sellingPrice !== "" && (
+          <Result
+            priceGBP={typeof sellingPrice === "number" ? sellingPrice / rate : 0}
+            rate={rate}
+            includeVAT={includeVAT} // 自動判定
+            calcResult={calcResult}
+          />
+        )}
 
-      {final && (
-        <FinalResult
-          shippingMethod={result?.method || ""}
-          shippingJPY={calcResult?.shippingJPY || 0}
-          categoryFeeJPY={calcResult?.categoryFeeJPY || 0}
-          data={final}
-        />
-      )}
-
+        {final && (
+          <FinalResult
+            shippingMethod={result?.method || ""}
+            shippingJPY={calcResult?.shippingJPY || 0}
+            categoryFeeJPY={calcResult?.categoryFeeJPY || 0}
+            data={final}
+          />
+        )}
+      </div>
 
     </div>
   );

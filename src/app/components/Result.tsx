@@ -29,11 +29,11 @@ export default function Result({ priceGBP, rate, includeVAT }: ResultProps) {
 
     return (
         <div className="result-box p-4 border rounded bg-gray-50">
-            <p>GBP価格: ￡{priceGBP.toFixed(2)}</p>
+            <p>GBP価格(ポンド): ￡{priceGBP.toFixed(2)}</p>
             <p>為替レート (手数料込み): {adjustedRate.toFixed(3)} 円</p>
-            <p>135ポンド以上： {overThreshold ? "はい" : "いいえ"}</p>
-            <p>VAT {includeVAT ? "含む" : "含まない"}</p>
-            <p className="font-bold text-lg mt-2">最終価格: ￥{finalJPY.toLocaleString()}</p>
+            <p>135ポンド超過： {overThreshold ? "はい" : "いいえ"}</p>
+            <p>VAT適用: {includeVAT ? "含む" : "含まない"}</p>
+            <p className="font-bold text-lg mt-2">概算価格: ￥{finalJPY.toLocaleString()}</p>
         </div>
     );
 }
