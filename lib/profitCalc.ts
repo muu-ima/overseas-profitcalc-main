@@ -29,7 +29,7 @@ export function calculateFinalProfitDetail({
     platformRate,
     includeVAT = false,
     exchangeRateGBPtoJPY,
-    targetMargin = 0.25, // 👈 例えば 25% をデフォルトにする
+    targetMargin = 0.25, // 👈 25% をデフォルトにする
 }: {
     sellingPrice: number;
     costPrice: number;

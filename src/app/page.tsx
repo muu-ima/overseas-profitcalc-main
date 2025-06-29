@@ -6,7 +6,7 @@ import ExchangeRate from "./components/ExchangeRate";
 import Result from "./components/Result";
 import {
   calculateCategoryFee,
-  convertShippingPriceToJPY,
+  // convertShippingPriceToJPY,
   calculateActualCost,
   calculateGrossProfit,
   calculateProfitMargin,
@@ -254,11 +254,15 @@ export default function Page() {
             className="w-full px-3 py-2 border rounded-md"
           >
             <option value="">カテゴリを選択してください</option>
-            {categoryOptions.map((cat: any) => (
-              <option key={cat.label} value={cat.value}>
-                {cat.label} ({cat.value}%)
-              </option>
-            ))}
+            <select>
+              <option value="">カテゴリを選択してください</option>
+              {categoryOptions.map((cat) => (
+                <option key={cat.label} value={cat.value}>
+                  {cat.label} ({cat.value}%)
+                </option>
+              ))}
+            </select>
+
           </select>
         </div>
         {/* <select
