@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useState } from "react";
 import { getCheapestShipping, ShippingData } from "@/lib/shipping";
 import ExchangeRate from "./components/ExchangeRate";
@@ -137,7 +138,7 @@ export default function Page() {
 
   useEffect(() => {
     if (rate !== null) {
-     console.log(`最新為替レート：${rate}`);
+      console.log(`最新為替レート：${rate}`);
     }
   }, [rate]);
 
@@ -172,10 +173,29 @@ export default function Page() {
           <label className="block font-semibold mb-1">仕入れ値 (円) </label>
           <input
             type="number"
+            step="10"
+            min="10"
             value={costPrice}
-            onChange={(e) =>
-              setCostPrice(e.target.value === "" ? "" : Number(e.target.value))
-            }
+            onChange={(e) => {
+              const raw = e.target.value;
+              //空なら空にする
+              if (raw === "") {
+                setCostPrice("");
+                return;
+              }
+
+              //数値化
+              let num = Number(raw);
+
+              //マイナスなら0に
+              if (num < 0) num = 0;
+
+              // 10未満の場合は 0 にする or 10 にする（どちらでも）
+              if (num % 10 !== 0) {
+                num = Math.round(num / 10) * 10;// 四捨五入が自然
+              } 
+              setCostPrice(num);
+            }}
             placeholder="仕入れ値"
             className="w-full px-3 py-2 border rounded-md"
           />
@@ -261,18 +281,7 @@ export default function Page() {
             ))}
           </select>
         </div>
-        {/* <select
-          value={selectedCategoryFee}
-          onChange={(e) => setSelectedCategoryFee(Number(e.target.value))}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="">カテゴリを選択してください</option>
-          {categoryOptions.map((cat) => (
-            <option key={cat.label} value={cat.value}>
-              {cat.label} ({cat.value}%)
-            </option>
-          ))}
-        </select> */}
+
       </div>
       {/* 右カラム */}
       <div className="flex-1 flex flex-col space-y-4">
