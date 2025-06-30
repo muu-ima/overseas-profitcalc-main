@@ -34,10 +34,13 @@ type CategoryFeeType = {
 type CalcResult = {
   shippingJPY: number,
   categoryFeeJPY: number;
-  actualCost: number;
-  grossProfit: number;
-  profitMargin: number;
-  method: string;
+  actualCost: number; // 総コスト（円）
+  grossProfit: number; // 粗利益（円）
+  profitMargin: number;// 利益率(%)
+  method: string; //選択配送方法
+  sellingPriceGBP: number; // 入力売値(GBP)
+  rate: number; // 為替レート
+  sellingPriceJPY: number; //売値(円換算)
 }
 
 
@@ -62,6 +65,8 @@ export default function Page() {
   // VATのStateを追加
   const [includeVAT, setIncludeVAT] = useState<boolean>(false);
 
+
+
   // 配送料データ読み込み
   useEffect(() => {
     fetch("/data/shipping.json")
@@ -71,14 +76,14 @@ export default function Page() {
 
   // VAT判定専用
   useEffect(() => {
-    if (sellingPrice !== "" && rate !== null) {
-      const priceGBP =
-        typeof sellingPrice === "number" ? sellingPrice / rate : 0;
+    if (typeof sellingPrice === "number" && rate !== null && rate > 0) {
+      const priceGBP = sellingPrice / rate; // 円からポンドに変換
       setIncludeVAT(isUnder135GBP(priceGBP));
     } else {
       setIncludeVAT(false);
     }
   }, [sellingPrice, rate]);
+
 
 
   // 計算結果用のuseEffect
@@ -95,7 +100,10 @@ export default function Page() {
       //配送料JPYに換算
       const shippingJPY = result.price ?? 0;
 
-
+      // ここで売値の変換をする
+      const sellingPriceGBP = typeof sellingPrice === "number" ? sellingPrice : 0;
+      // 円換算は掛け算
+      const sellingPriceJPY = sellingPriceGBP * (rate ?? 0);
       //カテゴリ手数料JPY計算
       const categoryFeeJPY = calculateCategoryFee(
         typeof sellingPrice === "number" ? sellingPrice : 0,
@@ -125,6 +133,9 @@ export default function Page() {
         grossProfit,
         profitMargin,
         method: result.method,
+        sellingPriceGBP,
+        sellingPriceJPY,
+        rate
       });
 
     }
@@ -198,7 +209,7 @@ export default function Page() {
           />
         </div>
         <div>
-          <label className="block font-semibold mb-1">売値 (円) </label>
+          <label className="block font-semibold mb-1">売値 (£) </label>
           <input
             type="number"
             value={sellingPrice}
@@ -208,6 +219,9 @@ export default function Page() {
             placeholder="売値"
             className="w-full px-3 py-2 border rounded-md"
           />
+          {rate !== null && sellingPrice !== "" && (
+            <p>概算円価格：約 {Math.round(Number(sellingPrice) * rate)} 円</p>
+          )}
         </div>
 
         <div>
@@ -310,7 +324,8 @@ export default function Page() {
         {/* 利益結果 */}
         {rate !== null && sellingPrice !== "" && (
           <Result
-            priceGBP={typeof sellingPrice === "number" ? sellingPrice / rate : 0}
+             originalPriceGBP={typeof sellingPrice === "number" ? sellingPrice : 0}  // ★ 修正
+            priceJPY={typeof sellingPrice === "number" && rate !== null ? sellingPrice * rate : 0}
             rate={rate}
             includeVAT={includeVAT} // 自動判定
             calcResult={calcResult}
