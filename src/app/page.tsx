@@ -190,10 +190,7 @@ export default function Page() {
               //マイナスなら0に
               if (num < 0) num = 0;
 
-              // 10未満の場合は 0 にする or 10 にする（どちらでも）
-              if (num % 10 !== 0) {
-                num = Math.round(num / 10) * 10;// 四捨五入が自然
-              } 
+
               setCostPrice(num);
             }}
             placeholder="仕入れ値"
