@@ -14,11 +14,11 @@ export default function ExchangeRate({
         fetch('https://enyukari.capoo.jp/profit-calc/exchangeRate.json')
         .then(res => res.json())
         .then(data => {
-            const base = data.rate;
-            const adjusted = getAdjustedRate(base);
-            setRawRate(base);
-            setAdjustedRate(adjusted);
-            if (onRateChange) onRateChange(data.rate);
+           console.log(data); // ← ここ！
+            const gbpRate = data.rates?.GBP ?? null;
+            setRawRate(gbpRate);
+            setAdjustedRate(getAdjustedRate(gbpRate));
+            if (onRateChange) onRateChange(gbpRate);
         })
         .catch(err => {
             console.error('為替取得エラー', err);
