@@ -13,19 +13,25 @@ export function isUnder135GBP(priceGBP: number): boolean {
 }
 
 /**
- * VAT込み価格を返す（加算後の価格）
+ * VAT込み価格を返す（条件付き）
  * @param priceGBP GBP価格
  */
 
 export function applyVAT(priceGBP: number): number {
-    return priceGBP *(1 + VAT_RATE);
+    if  (isUnder135GBP(priceGBP)) {
+        return priceGBP * (1 + VAT_RATE);
+    }
+    return priceGBP;
 }
 
 /**
- * VAT金額のみを返す
+ * VAT金額のみ (条件付き)
  * @param priceGBP GBP価格
  */
 
 export function calculateVAT(priceGBP: number): number {
-    return priceGBP * VAT_RATE;
+    if (isUnder135GBP(priceGBP)) {
+        return priceGBP * VAT_RATE;
+    }
+    return 0;
 }

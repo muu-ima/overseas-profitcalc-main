@@ -76,8 +76,8 @@ export default function Page() {
 
   // VAT判定専用
   useEffect(() => {
-    if (typeof sellingPrice === "number" && rate !== null && rate > 0) {
-      const priceGBP = sellingPrice / rate; // 円からポンドに変換
+    if (typeof sellingPrice === "number") {
+      const priceGBP = sellingPrice; 
       setIncludeVAT(isUnder135GBP(priceGBP));
     } else {
       setIncludeVAT(false);
@@ -106,9 +106,12 @@ export default function Page() {
       const sellingPriceJPY = sellingPriceGBP * (rate ?? 0);
       //カテゴリ手数料JPY計算
       const categoryFeeJPY = calculateCategoryFee(
-        typeof sellingPrice === "number" ? sellingPrice : 0,
+        typeof sellingPrice === "number" && rate !== null
+          ? sellingPrice * rate  // ← GBP → 円 にする
+          : 0,
         typeof selectedCategoryFee === "number" ? selectedCategoryFee : 0
       );
+
 
       //実費合計
       const actualCost = calculateActualCost(
@@ -298,7 +301,7 @@ export default function Page() {
       <div className="flex-1 flex flex-col space-y-4">
         {/* 配送結果と利益結果を右側に移動する */}
         <p className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          VAT: {includeVAT ? "適用（135GBP以下）" : "非適用（135GBP超え）"}
+          VAT: {includeVAT ? "適用（135GBP未満）" : "非適用（135GBP超え）"}
         </p>
         {/* 配送結果 */}
         <div className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -324,7 +327,7 @@ export default function Page() {
         {/* 利益結果 */}
         {rate !== null && sellingPrice !== "" && (
           <Result
-             originalPriceGBP={typeof sellingPrice === "number" ? sellingPrice : 0}  // ★ 修正
+            originalPriceGBP={typeof sellingPrice === "number" ? sellingPrice : 0}  // ★ 修正
             priceJPY={typeof sellingPrice === "number" && rate !== null ? sellingPrice * rate : 0}
             rate={rate}
             includeVAT={includeVAT} // 自動判定
