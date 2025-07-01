@@ -22,7 +22,7 @@ type ResultProps = {
     calcResult: CalcResult | null;  // anyを具体的に
 };
 
-export default function Result({ originalPriceGBP,priceJPY, rate, includeVAT }: ResultProps) {
+export default function Result({ originalPriceGBP, priceJPY, rate, includeVAT }: ResultProps) {
     const fee = 3.3; // 為替手数料（固定値でも可、将来的にprops化も可能）
 
     // 生レートに手数料を足して調整したレートを作る
@@ -39,9 +39,9 @@ export default function Result({ originalPriceGBP,priceJPY, rate, includeVAT }: 
 
     return (
         <div className="result-box p-4 border rounded bg-gray-50">
-            <p>GBP価格(ポンド): ￡{originalPriceGBP.toFixed(2)}</p>
-            <p>円換算価格: ￥{priceJPY.toLocaleString()}</p>
-            <p>為替レート (手数料込み): {adjustedRate.toFixed(3)} 円</p>
+            <p>GBP価格(ポンド): ￡{originalPriceGBP.toFixed(1)}</p>
+            <p>円換算価格: ￥{priceJPY.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+            <p>為替レート (手数料込み): {adjustedRate.toFixed(2)} 円</p>
             <p>135ポンド超過： {overThreshold ? "はい" : "いいえ"}</p>
             <p>VAT適用: {includeVAT ? "含む" : "含まない"}</p>
             <p className="font-bold text-lg mt-2">概算価格: ￥{finalJPY.toLocaleString()}</p>
