@@ -163,18 +163,19 @@ export default function Page() {
     }
   }, [shippingRates, weight, dimensions]);
 
-  const final = calcResult
-    ? calculateFinalProfitDetail({
-      sellingPrice: typeof sellingPrice === "number" ? sellingPrice : 0,
-      costPrice: typeof costPrice === "number" ? costPrice : 0,
+const final = calcResult && rate !== null
+  ? calculateFinalProfitDetail({
+      sellingPriceGBP: typeof sellingPrice === "number" ? sellingPrice : 0, // ✅ ここを修正
+      costPriceJPY: typeof costPrice === "number" ? costPrice : 0,
       shippingJPY: calcResult.shippingJPY,
-      categoryFeeJPY: calcResult.categoryFeeJPY,
-      customsRate: 4, // 関税率
-      platformRate: 0, // 任意
-      includeVAT: includeVAT, // 自動判定
-      exchangeRateGBPtoJPY: rate ?? undefined,
+      categoryFeePercent: typeof selectedCategoryFee === "number" ? selectedCategoryFee : 0,
+      customsRatePercent: 4,
+      payoneerFeePercent: 2,
+      includeVAT: includeVAT,
+      exchangeRateGBPtoJPY: rate,
     })
-    : null;
+  : null;
+
 
 
 

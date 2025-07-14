@@ -15,65 +15,97 @@ import { isUnder135GBP, applyVAT } from "./vatRule";
  * @returns {Object} 最終利益の詳細
  */
 export function calculateFinalProfitDetail({
-  sellingPrice: sellingPriceGBP,
-  costPrice,
+  sellingPriceGBP,
   shippingJPY,
-  categoryFeeJPY,
-  customsRate,
-  platformRate,
+  categoryFeePercent,
+  customsRatePercent,
+  payoneerFeePercent,
+  costPriceJPY,
   includeVAT = false,
-  exchangeRateGBPtoJPY: adjustedRate,
-  targetMargin = 0.25,
+  exchangeRateGBPtoJPY,
 }: {
-  sellingPrice: number; // GBP
-  costPrice: number; // JPY
+  sellingPriceGBP: number;   // 売値（￡）
+  costPriceJPY: number; // JPY
   shippingJPY: number; // JPY
-  categoryFeeJPY: number; // JPY
-  customsRate: number;
-  platformRate: number;
+  categoryFeePercent: number; // %
+  customsRatePercent: number;   // 関税 (%)
+  payoneerFeePercent: number;
   includeVAT?: boolean;
-  exchangeRateGBPtoJPY?: number;
-  targetMargin?: number;
+  exchangeRateGBPtoJPY: number;
 }) {
-  if (!adjustedRate) {
-    throw new Error("exchangeRateGBPtoJPY(adjustedRate) が必要です！");
+  if (!exchangeRateGBPtoJPY) {
+    throw new Error("exchangeRateGBPtoJPY が必要です！");
   }
 
-  // GBP → JPY に換算
-  const sellingPriceJPY = sellingPriceGBP * adjustedRate;
+  // 1. VAT込み売値 (￡)
+  const adjustedPriceGBP = includeVAT && isUnder135GBP(sellingPriceGBP)
+    ? applyVAT(sellingPriceGBP)
+    : sellingPriceGBP;
 
-  // VAT 適用後の GBP
-  let adjustedPriceGBP = sellingPriceGBP;
-  if (includeVAT && isUnder135GBP(sellingPriceGBP)) {
-    adjustedPriceGBP = applyVAT(sellingPriceGBP);
-  }
+  // 2. カテゴリ手数料 (￡)
+  const categoryFeeGBP = adjustedPriceGBP * (categoryFeePercent / 100);
+
+  // 3. 関税 (￡)
+  const customsFeeGBP = adjustedPriceGBP * (customsRatePercent / 100);
+
+  // 4. 粗利 (￡)
+  const grossProfitGBP = adjustedPriceGBP - (categoryFeeGBP + customsFeeGBP);
+
+  // 5. Payoneer手数料 (粗利の %) (￡)
+  const payoneerFeeGBP = grossProfitGBP * (payoneerFeePercent / 100);
+
+  // 6. 総手数料合計 (￡)
+  const totalFeesGBP = categoryFeeGBP + payoneerFeeGBP + customsFeeGBP;
+
+  // 7. 手数料引き後の正味GBP
+  const netSellingGBP = sellingPriceGBP - totalFeesGBP;
+
+  // 8.両替手数料(JPY)
+  const exchangeFeePerGBP = 3.3;
+  const exchangeFeeJPY = netSellingGBP * exchangeFeePerGBP;
+
+  // 9.正味JPY(GBP→JPY換算、両替手数料を引く)
+  const netSellingJPY = (netSellingGBP * exchangeRateGBPtoJPY) - exchangeFeeJPY;
+
+  // 10. VAT分（￡ → JPY）
+  const vatAmountGBP = adjustedPriceGBP - sellingPriceGBP;
+  const vatAmountJPY = vatAmountGBP * exchangeRateGBPtoJPY;
+
+  // 11. 最終利益JPY (仕入れ値・送料を引く)
+  const netProfitJPY = netSellingJPY - costPriceJPY - shippingJPY;
+
+  // 12. 最終損益 (JPY)
+  const finalProfitJPY = netProfitJPY; // 還付金などあればここで加算する
+
 
   // 最終的な JPY 売値
-  const adjustedSellingPriceJPY = adjustedPriceGBP * adjustedRate;
+  // const adjustedSellingPriceJPY = adjustedPriceGBP * adjustedRate;
 
-  const customsFee = adjustedSellingPriceJPY * (customsRate / 100);
-  const platformFee = adjustedSellingPriceJPY * (platformRate / 100);
+  // const customsFee = adjustedSellingPriceJPY * (customsRate / 100);
+  // const platformFee = adjustedSellingPriceJPY * (platformRate / 100);
 
-  const totalCost = costPrice + shippingJPY + categoryFeeJPY + customsFee + platformFee;
-  const profit = adjustedSellingPriceJPY - totalCost;
+  // const totalCost = costPrice + shippingJPY + categoryFeeJPY + customsFee + platformFee;
+  // const profit = adjustedSellingPriceJPY - totalCost;
 
-  const profitMargin =
-    adjustedSellingPriceJPY === 0 ? 0 : (profit / adjustedSellingPriceJPY) * 100;
+  // const profitMargin =
+  //   adjustedSellingPriceJPY === 0 ? 0 : (profit / adjustedSellingPriceJPY) * 100;
 
-  const vatAmount = adjustedSellingPriceJPY - sellingPriceJPY;
+  // const vatAmount = adjustedSellingPriceJPY - sellingPriceJPY;
 
-  const suggestedPrice = totalCost / (1 - targetMargin);
 
   return {
-    customsFee,
-    platformFee,
-    totalCost,
-    profit,
-    profitMargin,
-    vatAmount,
-    priceIncludingVAT: adjustedSellingPriceJPY,
-    suggestedPrice,
-    targetMargin,
+    adjustedPriceGBP,
+    categoryFeeGBP,
+    customsFeeGBP,
+    payoneerFeeGBP,
+    totalFeesGBP,
+    netSellingGBP,
+    exchangeFeeJPY,
+    netSellingJPY,
+    vatAmountGBP,
+    vatAmountJPY,
+    netProfitJPY,
+    finalProfitJPY,
   };
 }
 
