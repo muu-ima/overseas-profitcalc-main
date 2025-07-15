@@ -8,7 +8,6 @@ export default function ExchangeRate({
     onRateChange?: (rate: number | null) => void;
 }) {
     const [rawRate, setRawRate] = useState<number | null>(null);
-    const [adjustedRate, setAdjustedRate] = useState<number | null>(null);
 
     useEffect(()=> {
         fetch('https://enyukari.capoo.jp/profit-calc/exchangeRate.json')
@@ -22,7 +21,6 @@ export default function ExchangeRate({
         .catch(err => {
             console.error('為替取得エラー', err);
             setRawRate(null);
-            setAdjustedRate(null);
             if (onRateChange) onRateChange(null);
         });
     }, []);
