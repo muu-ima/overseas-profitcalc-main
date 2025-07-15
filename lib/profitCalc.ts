@@ -71,7 +71,7 @@ export function calculateFinalProfitDetail({
   const vatAmountGBP = adjustedPriceGBP - sellingPriceGBP;
   const vatAmountJPY = vatAmountGBP * exchangeRateGBPtoJPY;
 
-  // 11. 最終利益JPY (仕入れ値・送料を引く)
+  // 11. 利益JPY (仕入れ値・送料を引く)
   const netProfitJPY = netSellingJPY - costPriceJPY - shippingJPY;
 
   // 12. 最終損益 (JPY)

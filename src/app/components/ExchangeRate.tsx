@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from "react";
-import { getAdjustedRate} from "@/lib/exchange";
+
 
 export default function ExchangeRate({
     onRateChange,    
@@ -17,7 +17,6 @@ export default function ExchangeRate({
            console.log(data); // ← ここ！
             const gbpRate = data.rates?.GBP ?? null;
             setRawRate(gbpRate);
-            setAdjustedRate(getAdjustedRate(gbpRate));
             if (onRateChange) onRateChange(gbpRate);
         })
         .catch(err => {

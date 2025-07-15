@@ -73,7 +73,7 @@ export default function FinalResult({
         ￥{data.exchangeFeeJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円
       </p>
 
-      <p>正味JPY: {data.netSellingJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円</p>
+      <p>利益（売上 - 仕入 - 送料）: {data.netProfitJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円</p>
       <p>最終利益(JPY): {data.finalProfitJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円</p>
     </div>
   );
