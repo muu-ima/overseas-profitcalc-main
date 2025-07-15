@@ -77,22 +77,6 @@ export function calculateFinalProfitDetail({
   // 12. 最終損益 (JPY)
   const finalProfitJPY = netProfitJPY; // 還付金などあればここで加算する
 
-
-  // 最終的な JPY 売値
-  // const adjustedSellingPriceJPY = adjustedPriceGBP * adjustedRate;
-
-  // const customsFee = adjustedSellingPriceJPY * (customsRate / 100);
-  // const platformFee = adjustedSellingPriceJPY * (platformRate / 100);
-
-  // const totalCost = costPrice + shippingJPY + categoryFeeJPY + customsFee + platformFee;
-  // const profit = adjustedSellingPriceJPY - totalCost;
-
-  // const profitMargin =
-  //   adjustedSellingPriceJPY === 0 ? 0 : (profit / adjustedSellingPriceJPY) * 100;
-
-  // const vatAmount = adjustedSellingPriceJPY - sellingPriceJPY;
-
-
   return {
     adjustedPriceGBP,
     categoryFeeGBP,

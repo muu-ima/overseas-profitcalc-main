@@ -342,6 +342,7 @@ const final = calcResult && rate !== null
             shippingJPY={calcResult?.shippingJPY || 0}
             categoryFeeJPY={calcResult?.categoryFeeJPY || 0}
             data={final}
+            exchangeRateGBPtoJPY={rate!}
           />
         )}
       </div>

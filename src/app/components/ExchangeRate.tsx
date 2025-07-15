@@ -30,13 +30,9 @@ export default function ExchangeRate({
 
      return (
     <div className="bg-blue-100 border border-blue-400 rounded-md p-4 mb-4">
-      <h2 className="text-xl font-bold">現在の為替レート（手数料込み）</h2>
+      <h2 className="text-xl font-bold">現在の為替レート</h2>
       <p>
-        GBP → JPY  :{" "}
-        {adjustedRate !== null ? `${adjustedRate?.toFixed(2)}円` : '取得中...'}
-      </p>
-      <p className="text-sm text-gray-500">
-      (生レート: {rawRate !== null ? `${rawRate}円` : '取得中...'} /手数料: +3.3円)
+        GBP → JPY (生レート) : {rawRate !== null ? `${rawRate}円` : '取得中...'}
       </p>
     </div>
   );
