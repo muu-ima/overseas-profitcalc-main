@@ -3,16 +3,6 @@
 import React from "react";
 import { applyVAT, isUnder135GBP } from "@/lib/vatRule";
 
-
-type CalcResult = {
-    shippingJPY: number;
-    categoryFee: number;
-    actualCost: number;
-    grossProfit: number;
-    profitMargin: number;
-    method: string;
-};
-
 type ResultProps = {
     originalPriceGBP: number; // 入力そのままの GBP
     priceJPY: number; // 追加：計算済みのJPY価格をpropsで受け取る

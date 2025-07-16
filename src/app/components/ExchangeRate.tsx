@@ -23,7 +23,7 @@ export default function ExchangeRate({
             setRawRate(null);
             if (onRateChange) onRateChange(null);
         });
-    }, []);
+    }, [onRateChange]);
 
      return (
     <div className="bg-blue-100 border border-blue-400 rounded-md p-4 mb-4">
