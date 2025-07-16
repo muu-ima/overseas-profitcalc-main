@@ -14,7 +14,7 @@ import {
   calculateFinalProfitDetail,
 } from "@/lib/profitCalc";
 
-import { isUnder135GBP } from "@/lib/vatRule";
+import { isUnder135GBP, applyVAT } from "@/lib/vatRule";
 // import { calculateFinalProfitDetail } from "@/lib/profitCalc";
 import FinalResult from "./components/FinalResult";
 
@@ -33,7 +33,6 @@ type CategoryFeeType = {
 
 type CalcResult = {
   shippingJPY: number,
-  categoryFeeJPY: number;
   actualCost: number; // 総コスト（円）
   grossProfit: number; // 粗利益（円）
   profitMargin: number;// 利益率(%)
@@ -61,11 +60,8 @@ export default function Page() {
     ""
   );
   const [result, setResult] = useState<ShippingResult | null>(null);
-  const [calcResult, setCalcResult] = useState<CalcResult | null>(null);
   // VATのStateを追加
   const [includeVAT, setIncludeVAT] = useState<boolean>(false);
-
-
 
   // 配送料データ読み込み
   useEffect(() => {
@@ -77,7 +73,7 @@ export default function Page() {
   // VAT判定専用
   useEffect(() => {
     if (typeof sellingPrice === "number") {
-      const priceGBP = sellingPrice; 
+      const priceGBP = sellingPrice;
       setIncludeVAT(isUnder135GBP(priceGBP));
     } else {
       setIncludeVAT(false);
@@ -87,62 +83,48 @@ export default function Page() {
 
 
   // 計算結果用のuseEffect
-  useEffect(() => {
-    if (
-      sellingPrice !== "" &&
-      costPrice !== "" &&
-      rate !== null &&
-      weight !== null &&
-      result !== null &&
-      result.price !== null &&
-      selectedCategoryFee !== ""
-    ) {
-      //配送料JPYに換算
-      const shippingJPY = result.price ?? 0;
+  // useEffect(() => {
+  //   if (
+  //     sellingPrice !== "" &&
+  //     costPrice !== "" &&
+  //     rate !== null &&
+  //     weight !== null &&
+  //     result !== null &&
+  //     result.price !== null &&
+  //     selectedCategoryFee !== ""
+  //   ) {
+  //     //配送料JPYに換算
+  //     const shippingJPY = result.price ?? 0;
 
-      // ここで売値の変換をする
-      const sellingPriceGBP = typeof sellingPrice === "number" ? sellingPrice : 0;
-      // 円換算は掛け算
-      const sellingPriceJPY = sellingPriceGBP * (rate ?? 0);
-      //カテゴリ手数料JPY計算
-      const categoryFeeJPY = calculateCategoryFee(
-        typeof sellingPrice === "number" && rate !== null
-          ? sellingPrice * rate  // ← GBP → 円 にする
-          : 0,
-        typeof selectedCategoryFee === "number" ? selectedCategoryFee : 0
-      );
+  //     // ここで売値の変換をする
+  //     const sellingPriceGBP = typeof sellingPrice === "number" ? sellingPrice : 0;
+  //     // 円換算は掛け算
+  //     const sellingPriceJPY = sellingPriceGBP * (rate ?? 0);
+  //     // VAT込みの売値（adjustedPriceGBP）を計算する
+  //     const adjustedPriceGBP = includeVAT && isUnder135GBP(sellingPrice)
+  //       ? applyVAT(sellingPrice)
+  //       : sellingPrice;
 
 
-      //実費合計
-      const actualCost = calculateActualCost(
-        typeof costPrice === "number" ? costPrice : 0,
-        shippingJPY,
-        categoryFeeJPY
-      );
-      //粗利計算
-      const grossProfit = calculateGrossProfit(
-        typeof sellingPrice === "number" ? sellingPrice : 0,
-        actualCost
-      );
-      //利益率計算
-      const profitMargin = calculateProfitMargin(grossProfit,
-        typeof sellingPrice === "number" ? sellingPrice : 0
-      );
 
-      setCalcResult({
-        shippingJPY,
-        categoryFeeJPY,
-        actualCost,
-        grossProfit,
-        profitMargin,
-        method: result.method,
-        sellingPriceGBP,
-        sellingPriceJPY,
-        rate
-      });
+  //     //利益率計算
+  //     const profitMargin = calculateProfitMargin(grossProfit,
+  //       typeof sellingPrice === "number" ? sellingPrice : 0
+  //     );
 
-    }
-  }, [sellingPrice, costPrice, rate, weight, result, selectedCategoryFee]);
+  //     setCalcResult({
+  //       shippingJPY,
+  //       actualCost,
+  //       grossProfit,
+  //       profitMargin,
+  //       method: result.method,
+  //       sellingPriceGBP,
+  //       sellingPriceJPY,
+  //       rate
+  //     });
+
+  //   }
+  // }, [sellingPrice, costPrice, rate, weight, result, selectedCategoryFee]);
 
   useEffect(() => {
     fetch("/data/categoryFees.json")
@@ -163,20 +145,23 @@ export default function Page() {
     }
   }, [shippingRates, weight, dimensions]);
 
-const final = calcResult && rate !== null
-  ? calculateFinalProfitDetail({
-      sellingPriceGBP: typeof sellingPrice === "number" ? sellingPrice : 0, // ✅ ここを修正
-      costPriceJPY: typeof costPrice === "number" ? costPrice : 0,
-      shippingJPY: calcResult.shippingJPY,
-      categoryFeePercent: typeof selectedCategoryFee === "number" ? selectedCategoryFee : 0,
-      customsRatePercent: 4,
-      payoneerFeePercent: 2,
-      includeVAT: includeVAT,
-      exchangeRateGBPtoJPY: rate,
-    })
-  : null;
-
-
+  const final = (
+    typeof sellingPrice === "number" &&
+    typeof costPrice === "number" &&
+    rate !== null &&
+    result?.price !== null &&
+    result?.method &&
+    selectedCategoryFee !== ""
+  ) ? calculateFinalProfitDetail({
+    sellingPriceGBP: sellingPrice,
+    costPriceJPY: costPrice,
+    shippingJPY: result.price,
+    categoryFeePercent: selectedCategoryFee as number,
+    customsRatePercent: 1.35,
+    payoneerFeePercent: 2,
+    includeVAT: includeVAT,
+    exchangeRateGBPtoJPY: rate,
+  }) : null;
 
 
   return (
@@ -204,7 +189,6 @@ const final = calcResult && rate !== null
 
               //マイナスなら0に
               if (num < 0) num = 0;
-
 
               setCostPrice(num);
             }}
@@ -328,7 +312,6 @@ const final = calcResult && rate !== null
             priceJPY={typeof sellingPrice === "number" && rate !== null ? sellingPrice * rate : 0}
             rate={rate}
             includeVAT={includeVAT} // 自動判定
-            calcResult={calcResult}
             exchangeRateGBPtoJPY={rate!}
           />
         )}
@@ -336,8 +319,7 @@ const final = calcResult && rate !== null
         {final && (
           <FinalResult
             shippingMethod={result?.method || ""}
-            shippingJPY={calcResult?.shippingJPY || 0}
-            categoryFeeJPY={calcResult?.categoryFeeJPY || 0}
+            shippingJPY={result?.price || 0}
             data={final}
             exchangeRateGBPtoJPY={rate!}
           />

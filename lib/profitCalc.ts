@@ -41,28 +41,35 @@ export function calculateFinalProfitDetail({
   const adjustedPriceGBP = includeVAT && isUnder135GBP(sellingPriceGBP)
     ? applyVAT(sellingPriceGBP)
     : sellingPriceGBP;
+    console.log("1. VAT込み売値 (￡):", adjustedPriceGBP);
 
   // 2. カテゴリ手数料 (￡)
   const categoryFeeGBP = adjustedPriceGBP * (categoryFeePercent / 100);
+  console.log("2.カテゴリ手数料（￡）:", categoryFeeGBP);
 
   // 3. 関税 (￡)
   const customsFeeGBP = adjustedPriceGBP * (customsRatePercent / 100);
+  console.log("3. 関税（￡）:", customsFeeGBP);
 
   // 4. 粗利 (￡)
   const grossProfitGBP = adjustedPriceGBP - (categoryFeeGBP + customsFeeGBP);
+  console.log("4. 粗利（￡）:", grossProfitGBP);
 
   // 5. Payoneer手数料 (粗利の %) (￡)
   const payoneerFeeGBP = grossProfitGBP * (payoneerFeePercent / 100);
+  console.log("5. payoneer手数料（￡）:", payoneerFeeGBP);
 
   // 6. 総手数料合計 (￡)
   const totalFeesGBP = categoryFeeGBP + payoneerFeeGBP + customsFeeGBP;
+  console.log("6. 総手数料合計（￡）:", totalFeesGBP);
 
-  // 7. 手数料引き後の正味GBP
-  const netSellingGBP = sellingPriceGBP - totalFeesGBP;
-
+  // 7. 手数料引き後の正味収入 (￡) ← VAT込み総額ベース
+  const netSellingGBP = adjustedPriceGBP - totalFeesGBP;
+  console.log("7. 手数料引き後の正味収入（￡）:", netSellingGBP);
   // 8.両替手数料(JPY)
   const exchangeFeePerGBP = 3.3;
   const exchangeFeeJPY = netSellingGBP * exchangeFeePerGBP;
+  console.log("8.両替手数料(JPY)：", exchangeFeeJPY);
 
   // 9.正味JPY(GBP→JPY換算、両替手数料を引く)
   const netSellingJPY = (netSellingGBP * exchangeRateGBPtoJPY) - exchangeFeeJPY;
@@ -70,17 +77,21 @@ export function calculateFinalProfitDetail({
   // 10. VAT分（￡ → JPY）
   const vatAmountGBP = adjustedPriceGBP - sellingPriceGBP;
   const vatAmountJPY = vatAmountGBP * exchangeRateGBPtoJPY;
+  // 差額納付分
+  const vatToPayGBP = vatAmountGBP; 
 
   // 11. 利益JPY (仕入れ値・送料を引く)
-  const netProfitJPY = netSellingJPY - costPriceJPY - shippingJPY;
+  const netProfitJPY = netSellingJPY - vatAmountJPY - costPriceJPY - shippingJPY;
 
   // 12. 最終損益 (JPY)
   const finalProfitJPY = netProfitJPY; // 還付金などあればここで加算する
 
   return {
+    sellingPriceGBP,
     adjustedPriceGBP,
     categoryFeeGBP,
     customsFeeGBP,
+    costPriceJPY,
     payoneerFeeGBP,
     totalFeesGBP,
     netSellingGBP,
@@ -88,6 +99,7 @@ export function calculateFinalProfitDetail({
     netSellingJPY,
     vatAmountGBP,
     vatAmountJPY,
+     vatToPayGBP,
     netProfitJPY,
     finalProfitJPY,
   };

@@ -6,7 +6,7 @@ import { applyVAT, isUnder135GBP } from "@/lib/vatRule";
 
 type CalcResult = {
     shippingJPY: number;
-    categoryFeeJPY: number;
+    categoryFee: number;
     actualCost: number;
     grossProfit: number;
     profitMargin: number;
@@ -18,7 +18,6 @@ type ResultProps = {
     priceJPY: number; // 追加：計算済みのJPY価格をpropsで受け取る
     rate: number;         // APIから取得した生レート
     includeVAT: boolean;
-    calcResult: CalcResult | null;  // anyを具体的に
     exchangeRateGBPtoJPY: number;  // これを追加！
 };
 
