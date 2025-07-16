@@ -66,6 +66,7 @@ export function calculateFinalProfitDetail({
   // 7. 手数料引き後の正味収入 (￡) ← VAT込み総額ベース
   const netSellingGBP = adjustedPriceGBP - totalFeesGBP;
   console.log("7. 手数料引き後の正味収入（￡）:", netSellingGBP);
+  
   // 8.両替手数料(JPY)
   const exchangeFeePerGBP = 3.3;
   const exchangeFeeJPY = netSellingGBP * exchangeFeePerGBP;

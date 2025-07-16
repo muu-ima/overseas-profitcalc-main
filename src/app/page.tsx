@@ -6,15 +6,10 @@ import { getCheapestShipping, ShippingData } from "@/lib/shipping";
 import ExchangeRate from "./components/ExchangeRate";
 import Result from "./components/Result";
 import {
-  calculateCategoryFee,
-  // convertShippingPriceToJPY,
-  calculateActualCost,
-  calculateGrossProfit,
-  calculateProfitMargin,
   calculateFinalProfitDetail,
 } from "@/lib/profitCalc";
 
-import { isUnder135GBP, applyVAT } from "@/lib/vatRule";
+import { isUnder135GBP } from "@/lib/vatRule";
 // import { calculateFinalProfitDetail } from "@/lib/profitCalc";
 import FinalResult from "./components/FinalResult";
 
@@ -30,18 +25,6 @@ type CategoryFeeType = {
   value: number;
   categories: string[];
 };
-
-type CalcResult = {
-  shippingJPY: number,
-  actualCost: number; // 総コスト（円）
-  grossProfit: number; // 粗利益（円）
-  profitMargin: number;// 利益率(%)
-  method: string; //選択配送方法
-  sellingPriceGBP: number; // 入力売値(GBP)
-  rate: number; // 為替レート
-  sellingPriceJPY: number; //売値(円換算)
-}
-
 
 export default function Page() {
   // State管理
@@ -79,52 +62,6 @@ export default function Page() {
       setIncludeVAT(false);
     }
   }, [sellingPrice, rate]);
-
-
-
-  // 計算結果用のuseEffect
-  // useEffect(() => {
-  //   if (
-  //     sellingPrice !== "" &&
-  //     costPrice !== "" &&
-  //     rate !== null &&
-  //     weight !== null &&
-  //     result !== null &&
-  //     result.price !== null &&
-  //     selectedCategoryFee !== ""
-  //   ) {
-  //     //配送料JPYに換算
-  //     const shippingJPY = result.price ?? 0;
-
-  //     // ここで売値の変換をする
-  //     const sellingPriceGBP = typeof sellingPrice === "number" ? sellingPrice : 0;
-  //     // 円換算は掛け算
-  //     const sellingPriceJPY = sellingPriceGBP * (rate ?? 0);
-  //     // VAT込みの売値（adjustedPriceGBP）を計算する
-  //     const adjustedPriceGBP = includeVAT && isUnder135GBP(sellingPrice)
-  //       ? applyVAT(sellingPrice)
-  //       : sellingPrice;
-
-
-
-  //     //利益率計算
-  //     const profitMargin = calculateProfitMargin(grossProfit,
-  //       typeof sellingPrice === "number" ? sellingPrice : 0
-  //     );
-
-  //     setCalcResult({
-  //       shippingJPY,
-  //       actualCost,
-  //       grossProfit,
-  //       profitMargin,
-  //       method: result.method,
-  //       sellingPriceGBP,
-  //       sellingPriceJPY,
-  //       rate
-  //     });
-
-  //   }
-  // }, [sellingPrice, costPrice, rate, weight, result, selectedCategoryFee]);
 
   useEffect(() => {
     fetch("/data/categoryFees.json")
