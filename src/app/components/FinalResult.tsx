@@ -21,6 +21,8 @@ type FinalProfitDetail = {
   vatToPayJPY?: number;
   netProfitJPY: number;
   finalProfitJPY: number;
+  exchangeAdjustmentJPY: number;
+  feeRebateJPY: number;
 };
 
 type FinalResultProps = {
@@ -97,6 +99,12 @@ export default function FinalResult({
 
         <p>■ 利益（売上 - 仕入 - 送料）: {data.netProfitJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円</p>
         <p>■ 最終利益(JPY): {data.finalProfitJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円</p>
+
+           <p className="text-gray-500 text-sm">
+          ※ 税還付金 : ￡{(data.exchangeAdjustmentJPY / exchangeRateGBPtoJPY).toFixed(2)} / ￥{data.exchangeAdjustmentJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          <br></br>
+          ※ 手数料還付金 :￡{(data.feeRebateJPY / exchangeRateGBPtoJPY).toFixed(2)} / ￥{data.feeRebateJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+        </p>
       </div>
     </div>
   );

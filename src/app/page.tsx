@@ -11,7 +11,7 @@ import {
 
 import { isUnder135GBP } from "@/lib/vatRule";
 // import { calculateFinalProfitDetail } from "@/lib/profitCalc";
-import FinalResult from "./components/FinalResult";
+import FinalResultModal from "./components/FinalResultModal";
 
 
 // ここから型定義を追加
@@ -45,6 +45,8 @@ export default function Page() {
   const [result, setResult] = useState<ShippingResult | null>(null);
   // VATのStateを追加
   const [includeVAT, setIncludeVAT] = useState<boolean>(false);
+  //モーダル制御
+  const [isOpen, setIsOpen] = useState(false);
 
   // 配送料データ読み込み
   useEffect(() => {
@@ -100,6 +102,12 @@ export default function Page() {
     exchangeRateGBPtoJPY: rate,
   }) : null;
 
+  const isEnabled =
+    sellingPrice !== "" &&
+    costPrice !== "" &&
+    rate !== null &&
+    weight !== null &&
+    selectedCategoryFee !== "";
 
   return (
     <div className="p-4 max-w-7xl mx-auto flex flex-col md:flex-row md:space-x-8 space-y-8 md:space-y-0">
@@ -254,15 +262,26 @@ export default function Page() {
         )}
 
         {final && (
-          <FinalResult
-            shippingMethod={result?.method || ""}
-            shippingJPY={result?.price || 0}
-            data={final}
-            exchangeRateGBPtoJPY={rate!}
-          />
+          <button
+            onClick={() => setIsOpen(true)}
+            disabled={!isEnabled}
+            className={`btn-primary ${isEnabled ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer" : "bg-gray-400 cursor-not-allowed text-gray-200"}
+           px-8 py-4 text-lg rounded-full transition-colors duration-300`}          >
+            最終利益の詳細を見る
+          </button>
         )}
       </div>
 
+      {final && (
+        <FinalResultModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          shippingMethod={result?.method || ""}
+          shippingJPY={result?.price || 0}
+          data={final}
+          exchangeRateGBPtoJPY={rate!}
+        />
+      )}
     </div>
   );
 }
