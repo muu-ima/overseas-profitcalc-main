@@ -12,6 +12,7 @@ import {
 import { isUnder135GBP } from "@/lib/vatRule";
 // import { calculateFinalProfitDetail } from "@/lib/profitCalc";
 import FinalResultModal from "./components/FinalResultModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 // ここから型定義を追加
@@ -47,6 +48,7 @@ export default function Page() {
   const [includeVAT, setIncludeVAT] = useState<boolean>(false);
   //モーダル制御
   const [isOpen, setIsOpen] = useState(false);
+  const [showButton, setShowButton] = useState(false);
 
   // 配送料データ読み込み
   useEffect(() => {
@@ -83,6 +85,7 @@ export default function Page() {
       setResult(cheapest);
     }
   }, [shippingRates, weight, dimensions]);
+
 
   const final = (
     typeof sellingPrice === "number" &&
@@ -261,15 +264,25 @@ export default function Page() {
           />
         )}
 
-        {final && (
-          <button
-            onClick={() => setIsOpen(true)}
-            disabled={!isEnabled}
-            className={`btn-primary ${isEnabled ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer" : "bg-gray-400 cursor-not-allowed text-gray-200"}
-           px-8 py-4 text-lg rounded-full transition-colors duration-300`}          >
-            最終利益の詳細を見る
-          </button>
-        )}
+        <AnimatePresence>
+          {final && (
+            <motion.button key="final-profit-button" 
+              onClick={() => setIsOpen(true)}
+              disabled={!isEnabled}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.5 }}
+              className={`btn-primary ${isEnabled
+                  ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                  : "bg-gray-400 cursor-not-allowed text-gray-200"
+                } px-8 py-4 text-lg rounded-full`}
+            >
+              最終利益の詳細を見る
+            </motion.button>
+          )}
+        </AnimatePresence>
+
       </div>
 
       {final && (
