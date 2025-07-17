@@ -48,7 +48,7 @@ export default function Page() {
   const [includeVAT, setIncludeVAT] = useState<boolean>(false);
   //モーダル制御
   const [isOpen, setIsOpen] = useState(false);
-  const [showButton, setShowButton] = useState(false);
+
 
   // 配送料データ読み込み
   useEffect(() => {
