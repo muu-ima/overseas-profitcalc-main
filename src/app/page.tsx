@@ -148,10 +148,24 @@ export default function Page() {
           <label className="block font-semibold mb-1">売値 (£) </label>
           <input
             type="number"
+            step="0.01"
             value={sellingPrice}
-            onChange={(e) =>
-              setSellingPrice(e.target.value === "" ? "" : Number(e.target.value))
-            }
+            onChange={(e) => {
+              const raw = e.target.value;
+              if (raw === "") {
+                setSellingPrice("");
+                return;
+              }
+
+              let num = Number(raw);
+              if (num < 0) num = 0;
+
+              //小数点第3位以下切り捨て
+              num = Math.floor(num * 100) / 100;
+
+              setSellingPrice(num);
+            }}
+
             placeholder="売値"
             className="w-full px-3 py-2 border rounded-md"
           />
@@ -266,7 +280,7 @@ export default function Page() {
 
         <AnimatePresence>
           {final && (
-            <motion.button key="final-profit-button" 
+            <motion.button key="final-profit-button"
               onClick={() => setIsOpen(true)}
               disabled={!isEnabled}
               initial={{ opacity: 0, y: 20 }}
@@ -274,8 +288,8 @@ export default function Page() {
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.5 }}
               className={`btn-primary ${isEnabled
-                  ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
-                  : "bg-gray-400 cursor-not-allowed text-gray-200"
+                ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                : "bg-gray-400 cursor-not-allowed text-gray-200"
                 } px-8 py-4 text-lg rounded-full`}
             >
               最終利益の詳細を見る
