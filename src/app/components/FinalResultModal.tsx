@@ -5,6 +5,7 @@ import FinalResult from "./FinalResult";
 
 type FinalProfitDetail = {
   costPriceJPY: number;
+  sellingPriceJPY: number;
   sellingPriceGBP: number;
   adjustedPriceGBP: number;
   categoryFeeGBP: number;
@@ -24,6 +25,7 @@ type FinalProfitDetail = {
   finalProfitJPY: number;
   exchangeAdjustmentJPY: number;
   feeRebateJPY: number;
+  profitMargin: number; 
 };
 
 type FinalResultModalProps = {

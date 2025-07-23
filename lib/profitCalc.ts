@@ -90,10 +90,16 @@ export function calculateFinalProfitDetail({
   const feeRebateJPY = (categoryFeeGBP * 10 / 100) * exchangeRateGBPtoJPY;
 
   // 12. 最終損益 (JPY)
-  const finalProfitJPY = netProfitJPY + exchangeAdjustmentJPY + feeRebateJPY; // 還付金などあればここで加算する
+  const finalProfitJPY = netProfitJPY + exchangeAdjustmentJPY + feeRebateJPY;
+
+  // 13. 利益率
+  const sellingPriceJPY = sellingPriceGBP * exchangeRateGBPtoJPY;
+  const profitMargin = sellingPriceJPY === 0 ? 0 : (finalProfitJPY / sellingPriceJPY) * 100;
+
 
   return {
     sellingPriceGBP,
+    sellingPriceJPY,
     adjustedPriceGBP,
     categoryFeeGBP,
     customsFeeGBP,
@@ -110,6 +116,7 @@ export function calculateFinalProfitDetail({
     finalProfitJPY,
     exchangeAdjustmentJPY,
     feeRebateJPY,
+    profitMargin
   };
 }
 

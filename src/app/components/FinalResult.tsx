@@ -4,6 +4,7 @@
 
 type FinalProfitDetail = {
   costPriceJPY: number;
+  sellingPriceJPY: number; 
   sellingPriceGBP: number; // 元値も渡しておく
   adjustedPriceGBP: number;
   categoryFeeGBP: number;
@@ -23,6 +24,7 @@ type FinalProfitDetail = {
   finalProfitJPY: number;
   exchangeAdjustmentJPY: number;
   feeRebateJPY: number;
+  profitMargin: number;
 };
 
 type FinalResultProps = {
@@ -99,8 +101,11 @@ export default function FinalResult({
 
         <p>■ 利益（売上 - 仕入 - 送料）: {data.netProfitJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円</p>
         <p>■ 最終利益(JPY): {data.finalProfitJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })} 円</p>
-
-           <p className="text-gray-500 text-sm">
+        <div className="flex justify-between items-center border-t pt-4">
+          <span className="text-gray-700 font-medium">利益率</span>
+          <span className="text-2xl font-bold text-green-600">{data.profitMargin.toFixed(2)}%</span>
+        </div>
+        <p className="text-gray-500 text-sm">
           ※ 税還付金 : ￡{(data.exchangeAdjustmentJPY / exchangeRateGBPtoJPY).toFixed(2)} / ￥{data.exchangeAdjustmentJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           <br></br>
           ※ 手数料還付金 :￡{(data.feeRebateJPY / exchangeRateGBPtoJPY).toFixed(2)} / ￥{data.feeRebateJPY.toLocaleString(undefined, { maximumFractionDigits: 0 })}
