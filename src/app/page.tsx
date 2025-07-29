@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getCheapestShipping, ShippingData } from "@/lib/shipping";
 import ExchangeRate from "./components/ExchangeRate";
 import Result from "./components/Result";
@@ -39,6 +39,7 @@ export default function Page() {
     height: 0,
   });
   const [rate, setRate] = useState<number | null>(null);
+  const [currency, setCurrency] = useState<'GBP' | 'USD'>('GBP');
   const [categoryOptions, setCategoryOptions] = useState<CategoryFeeType[]>([]);
   const [selectedCategoryFee, setSelectedCategoryFee] = useState<number | "">(
     ""
@@ -86,6 +87,10 @@ export default function Page() {
     }
   }, [shippingRates, weight, dimensions]);
 
+const handleRateChange = useCallback((newRate: number | null, newCurrency: 'GBP' | 'USD') => {
+    setRate(newRate);
+    setCurrency(newCurrency);
+  }, []);
 
   const final = (
     typeof sellingPrice === "number" &&
@@ -116,7 +121,7 @@ export default function Page() {
     <div className="p-4 max-w-7xl mx-auto flex flex-col md:flex-row md:space-x-8 space-y-8 md:space-y-0">
       <div className="flex-1 flex flex-col space-y-4">
         {/* 為替レート表示コンポーネント */}
-        <ExchangeRate onRateChange={setRate} />
+        <ExchangeRate onRateChange={handleRateChange} />
         <div>
           <label className="block font-semibold mb-1">仕入れ値 (円) </label>
           <input
@@ -145,7 +150,9 @@ export default function Page() {
           />
         </div>
         <div>
-          <label className="block font-semibold mb-1">売値 (£) </label>
+          <label className="block font-semibold mb-1">
+            売値 ({currency === "GBP" ? "£" : "$"})
+          </label>
           <input
             type="number"
             step="0.01"

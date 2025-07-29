@@ -51,7 +51,7 @@ export default function FinalResult({
         <p>■ 配送料:
           £{(shippingJPY / exchangeRateGBPtoJPY).toFixed(2)} /
           ¥{shippingJPY.toLocaleString()} 円</p>
-        <p>■ 仕入れ : ${(data.costPriceJPY / exchangeRateGBPtoJPY).toFixed(2)} / ￥{data.costPriceJPY.toLocaleString()}</p>
+        <p>■ 仕入れ : ￡{(data.costPriceJPY / exchangeRateGBPtoJPY).toFixed(2)} / ￥{data.costPriceJPY.toLocaleString()}</p>
 
         <div className="border-t border-gray-300 my-2" />
         <p>
