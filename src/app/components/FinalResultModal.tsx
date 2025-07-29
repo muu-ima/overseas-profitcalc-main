@@ -25,7 +25,7 @@ type FinalProfitDetail = {
   finalProfitJPY: number;
   exchangeAdjustmentJPY: number;
   feeRebateJPY: number;
-  profitMargin: number; 
+  profitMargin: number;
 };
 
 type FinalResultModalProps = {
@@ -47,20 +47,22 @@ export default function FinalResultModal({
 }: FinalResultModalProps) {
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      {/* 背景 */}
-      <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
+      {/* 背景オーバーレイ */}
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" aria-hidden="true" />
 
-      {/* モーダルの中央配置 */}
+      {/* モーダル中央配置 */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-lg">
-          <Dialog.Title className="text-xl font-bold mb-4">
+        <Dialog.Panel className="relative bg-white rounded-2xl p-8 w-full sm:max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-300 ease-in-out">
+          {/* タイトル */}
+          <Dialog.Title className="text-2xl font-semibold mb-6 text-center">
             最終利益の詳細
           </Dialog.Title>
 
-          {/* Close ボタン */}
+          {/* 閉じるボタン */}
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 text-gray-500 hover:text-black"
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition"
+            aria-label="Close"
           >
             ✕
           </button>
