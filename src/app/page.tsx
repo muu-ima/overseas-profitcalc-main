@@ -5,15 +5,12 @@ import { useEffect, useState, useCallback } from "react";
 import { getCheapestShipping, ShippingData } from "@/lib/shipping";
 import ExchangeRate from "./components/ExchangeRate";
 import Result from "./components/Result";
-import {
-  calculateFinalProfitDetail,
-} from "@/lib/profitCalc";
+import { calculateFinalProfitDetail } from "@/lib/profitCalc";
 
 import { isUnder135GBP } from "@/lib/vatRule";
 // import { calculateFinalProfitDetail } from "@/lib/profitCalc";
 import FinalResultModal from "./components/FinalResultModal";
 import { motion, AnimatePresence } from "framer-motion";
-
 
 // ここから型定義を追加
 type ShippingResult = {
@@ -39,7 +36,7 @@ export default function Page() {
     height: 0,
   });
   const [rate, setRate] = useState<number | null>(null);
-  const [currency, setCurrency] = useState<'GBP' | 'USD'>('GBP');
+  const [currency, setCurrency] = useState<"GBP" | "USD">("GBP");
   const [categoryOptions, setCategoryOptions] = useState<CategoryFeeType[]>([]);
   const [selectedCategoryFee, setSelectedCategoryFee] = useState<number | "">(
     ""
@@ -49,7 +46,6 @@ export default function Page() {
   const [includeVAT, setIncludeVAT] = useState<boolean>(false);
   //モーダル制御
   const [isOpen, setIsOpen] = useState(false);
-
 
   // 配送料データ読み込み
   useEffect(() => {
@@ -87,28 +83,32 @@ export default function Page() {
     }
   }, [shippingRates, weight, dimensions]);
 
-const handleRateChange = useCallback((newRate: number | null, newCurrency: 'GBP' | 'USD') => {
-    setRate(newRate);
-    setCurrency(newCurrency);
-  }, []);
+  const handleRateChange = useCallback(
+    (newRate: number | null, newCurrency: "GBP" | "USD") => {
+      setRate(newRate);
+      setCurrency(newCurrency);
+    },
+    []
+  );
 
-  const final = (
+  const final =
     typeof sellingPrice === "number" &&
     typeof costPrice === "number" &&
     rate !== null &&
     result?.price !== null &&
     result?.method &&
     selectedCategoryFee !== ""
-  ) ? calculateFinalProfitDetail({
-    sellingPriceGBP: sellingPrice,
-    costPriceJPY: costPrice,
-    shippingJPY: result.price,
-    categoryFeePercent: selectedCategoryFee as number,
-    customsRatePercent: 1.35,
-    payoneerFeePercent: 2,
-    includeVAT: includeVAT,
-    exchangeRateGBPtoJPY: rate,
-  }) : null;
+      ? calculateFinalProfitDetail({
+          sellingPriceGBP: sellingPrice,
+          costPriceJPY: costPrice,
+          shippingJPY: result.price,
+          categoryFeePercent: selectedCategoryFee as number,
+          customsRatePercent: 1.35,
+          payoneerFeePercent: 2,
+          includeVAT: includeVAT,
+          exchangeRateGBPtoJPY: rate,
+        })
+      : null;
 
   const isEnabled =
     sellingPrice !== "" &&
@@ -172,7 +172,6 @@ const handleRateChange = useCallback((newRate: number | null, newCurrency: 'GBP'
 
               setSellingPrice(num);
             }}
-
             placeholder="売値"
             className="w-full px-3 py-2 border rounded-md"
           />
@@ -249,37 +248,35 @@ const handleRateChange = useCallback((newRate: number | null, newCurrency: 'GBP'
             ))}
           </select>
         </div>
-
       </div>
       {/* 右カラム */}
       <div className="flex-1 flex flex-col space-y-4">
         {/* 配送結果 */}
         <div className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <p>配送方法: {result === null ? "計算中..." : result.method}</p>
           <p>
-            配送方法: {
-              result === null
-                ? "計算中..."
-                : result.method
-            }
-          </p>
-          <p>
-            配送料: {
-              result === null
-                ? "計算中..."
-                : result.price !== null
-                  ? `${result.price}円`
-                  : "不明"
-            }
+            配送料:{" "}
+            {result === null
+              ? "計算中..."
+              : result.price !== null
+              ? `${result.price}円`
+              : "不明"}
           </p>
         </div>
-
 
         {/* 利益結果 */}
         {rate !== null && sellingPrice !== "" && (
           <Result
-            originalPriceGBP={typeof sellingPrice === "number" ? sellingPrice : 0}  // ★ 修正
-            priceJPY={typeof sellingPrice === "number" && rate !== null ? sellingPrice * rate : 0}
-            rate={rate}
+            originalPriceGBP={
+              typeof sellingPrice === "number" ? sellingPrice : 0
+            } // ★ 修正
+            priceJPY={
+              typeof sellingPrice === "number" && rate !== null
+                ? sellingPrice * rate
+                : 0
+            }
+            finalData={final}
+            rate={rate!}
             includeVAT={includeVAT} // 自動判定
             exchangeRateGBPtoJPY={rate!}
           />
@@ -287,23 +284,24 @@ const handleRateChange = useCallback((newRate: number | null, newCurrency: 'GBP'
 
         <AnimatePresence>
           {final && (
-            <motion.button key="final-profit-button"
+            <motion.button
+              key="final-profit-button"
               onClick={() => setIsOpen(true)}
               disabled={!isEnabled}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.5 }}
-              className={`btn-primary ${isEnabled
-                ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
-                : "bg-gray-400 cursor-not-allowed text-gray-200"
-                } px-8 py-4 text-lg rounded-full`}
+              className={`btn-primary ${
+                isEnabled
+                  ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                  : "bg-gray-400 cursor-not-allowed text-gray-200"
+              } px-8 py-4 text-lg rounded-full`}
             >
               最終利益の詳細を見る
             </motion.button>
           )}
         </AnimatePresence>
-
       </div>
 
       {final && (
