@@ -248,7 +248,7 @@ export default function Page() {
           </div>
 
           {/* ★ 追加: 自動フォーム or 手動フォーム（切替） */}
-          <div className="mt-2 rounded-lg p-3 min-h-[200px]">
+          <div className="mt-2 rounded-lg min-h-[150px]">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={shippingMode}
